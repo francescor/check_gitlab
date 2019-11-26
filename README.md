@@ -76,6 +76,7 @@ define command{
 
 ## Requirements
 
+https://github.com/dbroeglin/nagios_check 
 ```
-gem install nagios-check # see https://github.com/dbroeglin/nagios_check
+gem install nagios-check 
 ```
