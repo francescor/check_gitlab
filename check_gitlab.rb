@@ -29,23 +29,34 @@ class SimpleCheck
     rescue Timeout::Error, Errno::EINVAL, Errno::ECONNRESET, EOFError,
        Net::HTTPBadResponse, Net::HTTPHeaderSyntaxError, Net::ProtocolError => e
     end
-    my_json = JSON.parse(response)
-    my_json.keys.each do |key|
-      if my_json[key].keys[0] = 'status'
-        if my_json[key]['status'] == 'ok'
-        else
-          number_of_fails += 1
-          failure_descriptions = "'#{key}' #{failure_descriptions}"
+    if options.uri.split('/').last == 'health'
+      # string response
+      puts response
+      if response[0..8] == 'GitLab OK'
+        number_of_fails = 0
+      else
+        number_of_fails = 1
+      end
+      store_message = response
+    else
+      # json response 
+      my_json = JSON.parse(response)
+      my_json.keys.each do |key|
+        if my_json[key].keys[0] = 'status'
+          if my_json[key]['status'] == 'ok'
+          else
+            number_of_fails += 1
+            failure_descriptions = "'#{key}' #{failure_descriptions}"
+          end
         end
       end
+      if number_of_fails == 0
+        store_message "Full json: #{my_json}"
+      else
+        store_message "N. #{number_of_fails} failures on #{failure_descriptions} - Full json: #{my_json}"
+      end
     end
-
     store_value :number_of_fails, number_of_fails
-    if number_of_fails == 0
-      store_message "Full json: #{my_json}"
-    else
-      store_message "N. #{number_of_fails} failures on #{failure_descriptions} - Full json: #{my_json}"
-    end
   end
 end
 
