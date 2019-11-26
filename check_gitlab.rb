@@ -5,8 +5,9 @@ require "nagios_check"
 require 'json'
 require 'net/http'
 
-# ruby check_gitlab.rb  --host mygitlab.xxx.com --port 7575  --uri '/-/readiness' -w 0 -c 1
-# ruby check_gitlab.rb  --host mygitlab.xxx.com --port 7575  --uri '/-/liveness' -w 0 -c 1
+# check_gitlab.rb  --host mygitlab.xxx.com --port 7575  --uri '/-/readiness' -w 0 -c 1
+# check_gitlab.rb  --host mygitlab.xxx.com --port 7575  --uri '/-/liveness' -w 0 -c 1
+# check_gitlab.rb  --host mygitlab.xxx.com --port 7575  --uri '/-/health' -w 0 -c 1
 
 class SimpleCheck
   include NagiosCheck
