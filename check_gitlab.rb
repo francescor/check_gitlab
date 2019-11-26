@@ -1,5 +1,5 @@
-#!~/.rvm/rubies/ruby-2.3.4/bin/ruby
-# (adapt the above to your ruby: `which ruby`)
+#!/bin/ruby
+# (adapt the above to your ruby: see `which ruby`)
 
 require "nagios_check"
 require 'json'
