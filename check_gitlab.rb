@@ -1,6 +1,9 @@
 #!/bin/ruby
 # (adapt the above to your ruby: see `which ruby`)
 
+# https://docs.gitlab.com/ce/user/admin_area/monitoring/health_check.html
+# curl http://git.bwlocal.it/-/livenes
+
 require "nagios_check"
 require 'json'
 require 'net/http'
@@ -39,22 +42,33 @@ class SimpleCheck
         number_of_fails = 1
       end
       store_message = response
+    elsif response == '{"status":"ok"}'
+      number_of_fails = 0
+      store_message = response
+    elsif response == '{"status":"ok","master_check":[{"status":"ok"}]}'
+      number_of_fails = 0
+      store_message = response
     else
       # json response 
       my_json = JSON.parse(response)
-      my_json.keys.each do |key|
-        if my_json[key].keys[0] = 'status'
-          if my_json[key]['status'] == 'ok'
-          else
-            number_of_fails += 1
-            failure_descriptions = "'#{key}' #{failure_descriptions}"
+      if my_json.class == Hash
+        my_json.keys.each do |key|
+          if my_json[key].keys[0] = 'status'
+            if my_json[key]['status'] == 'ok'
+            else
+              number_of_fails += 1
+              failure_descriptions = "'#{key}' #{failure_descriptions}"
+            end
           end
         end
-      end
-      if number_of_fails == 0
-        store_message "Full json: #{my_json}"
+        if number_of_fails == 0
+          store_message "Full json: #{my_json}"
+        else
+          store_message "N. #{number_of_fails} failures on #{failure_descriptions} - Full json: #{my_json}"
+        end
       else
-        store_message "N. #{number_of_fails} failures on #{failure_descriptions} - Full json: #{my_json}"
+        number_of_fails += 1
+        store_message "Output is not Json - Output: #{response} Full json: #{my_json}"
       end
     end
     store_value :number_of_fails, number_of_fails
