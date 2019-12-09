@@ -76,6 +76,8 @@ define command{
 
 ## Requirements
 
+Gitlab 12.5.3
+
 https://github.com/dbroeglin/nagios_check 
 ```
 gem install nagios-check 
