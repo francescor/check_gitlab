@@ -26,7 +26,57 @@ Usage: check_gitlab [options]
     -t TIMEOUT
 ```
 
+## host definition
+
+```
+define service {
+        use                             generic-service
+        host_name                       mygitlab.xxx.com
+        service_description             check_gitlab_health
+        check_command                   check_gitlab_health!0!1!80
+        check_interval                  10
+}
+
+define service {
+        use                             generic-service
+        host_name                       mygitlab.xxx.com
+        service_description             check_gitlab_readiness
+        check_command                   check_gitlab_readiness!0!1!80
+        check_interval                  10
+}
+define service {
+        use                             generic-service
+        host_name                       mygitlab.xxx.com
+        service_description             check_gitlab_liveness
+        check_command                   check_gitlab_liveness!0!1!80
+        check_interval                  10
+}
+```
+
+## command definition
+
+```
+# adapt $USER3$ in the code below, or just paste the path to your executable check_gitlab.rb
+define command{
+        command_name    check_gitlab_health
+        command_line    $USER3$/check_gitlab/check_gitlab.rb --host '$HOSTNAME$' -w '$ARG1$' -c '$ARG2$' --port '$ARG3$' --uri '/-/health'
+
+}
+
+define command{
+        command_name    check_gitlab_readiness
+        command_line    $USER3$/check_gitlab/check_gitlab.rb --host '$HOSTNAME$' -w '$ARG1$' -c '$ARG2$' --port '$ARG3$' --uri '/-/readiness'
+}
+
+define command{
+        command_name    check_gitlab_liveness
+        command_line    $USER3$/check_gitlab/check_gitlab.rb --host '$HOSTNAME$' -w '$ARG1$' -c '$ARG2$' --port '$ARG3$' --uri '/-/liveness'
+}
+```
+
 ## Requirements
 
-* https://github.com/dbroeglin/nagios_check
-
+https://github.com/dbroeglin/nagios_check 
+```
+gem install nagios-check 
+```
